@@ -11,7 +11,7 @@ hand, this automates the repetitive part (background removal, cropping,
 resizing, centering, renaming) so the design work stays focused on UX and
 interaction, not production busywork.
 
-| Before | After |
+| Before | After (in the actual 60×60 circular slot) |
 | --- | --- |
 | ![before](examples/before.png) | ![after](examples/after.png) |
 
