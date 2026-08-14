@@ -20,7 +20,7 @@ interaction, not production busywork.
 1. **Background removal** — [rembg](https://github.com/danielgatis/rembg) (u2net model, runs locally) strips the original background, with alpha matting enabled for cleaner edges.
 2. **Content-aware crop** — trims transparent margins so only the product remains, regardless of how much padding the source photo had.
 3. **Consistent fit** — scales each product so it fills the same proportion of a 60×60 circular slot, then centers it on a transparent canvas.
-4. **Sequential rename** — outputs `product-001.png`, `product-002.png`, ... with a `mapping.csv` tracking which original file became which.
+4. **Export** — saves as `.png` under the original filename by default (or renumbered sequentially with `--naming sequential`), with a `mapping.csv` tracking original → output names.
 
 Two edge cases that came up while building this, worth noting:
 - Source PNGs that already had transparency sometimes had garbage RGB data hidden behind `alpha=0` (e.g. black), which bled into the new cutout as a dark fringe. Fixed by flattening onto white before background removal.
@@ -37,8 +37,8 @@ pip install -r requirements.txt
 python3 process_images.py
 ```
 
-Output lands in `output/` as `product-001.png`, `product-002.png`, ... at
-exactly 60×60. Options:
+Output lands in `output/`, keeping each source file's original name (as
+`.png`) at exactly 60×60. Options:
 
 | Flag | Default | Description |
 | --- | --- | --- |
@@ -47,7 +47,8 @@ exactly 60×60. Options:
 | `--size` | `60` | Canvas size in px |
 | `--scale` | `1` | Export multiplier (e.g. `4` → 240×240 for retina) |
 | `--fill-ratio` | `0.7` | How much of the circle's diagonal the product fills |
-| `--prefix` | `product` | Output filename prefix |
+| `--naming` | `original` | `original` keeps the source filename, `sequential` renumbers (`product-001.png`, ...) |
+| `--prefix` | `product` | Output filename prefix when `--naming sequential` |
 | `--model` | `u2net` | rembg model (try `isnet-general-use` for sharper cutouts) |
 
 The 60×60 circle spec matches this project's icon slots, but every dimension

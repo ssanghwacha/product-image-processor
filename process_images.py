@@ -2,8 +2,9 @@
 """Batch product image processor.
 
 Removes backgrounds with rembg, crops to content, scales each product to fit
-consistently inside a circular icon slot, centers it on a transparent square
-canvas, and renames the output sequentially (product-001.png, ...).
+consistently inside a circular icon slot, and centers it on a transparent
+square canvas. Output keeps the original filename by default (as .png), or
+can be renumbered sequentially with --naming sequential.
 """
 
 import argparse
@@ -110,7 +111,8 @@ def main():
     parser.add_argument("--size", type=int, default=60, help="Target square canvas size in px (default: 60)")
     parser.add_argument("--scale", type=int, default=1, help="Export multiplier, e.g. 4 for a 240x240 retina asset at size=60 (default: 1 -> exactly 60x60)")
     parser.add_argument("--fill-ratio", type=float, default=0.7, help="Fraction of the circle's diagonal the product should fill, 0-1 (default: 0.7)")
-    parser.add_argument("--prefix", default="product", help="Output filename prefix (default: product)")
+    parser.add_argument("--naming", choices=["original", "sequential"], default="original", help="Output filename scheme: keep the original filename, or renumber sequentially (default: original)")
+    parser.add_argument("--prefix", default="product", help="Output filename prefix when --naming sequential (default: product)")
     parser.add_argument("--start", type=int, default=1, help="Starting number for sequential naming (default: 1)")
     parser.add_argument("--digits", type=int, default=3, help="Zero-padding digits for sequence number (default: 3)")
     parser.add_argument("--model", default="u2net", help="rembg model name (default: u2net; try isnet-general-use for sharper cutouts)")
@@ -145,9 +147,20 @@ def main():
 
     canvas_px = args.size * args.scale
     mapping_rows = []
+    used_names = set()
 
     for i, src_path in enumerate(files, start=args.start):
-        new_name = f"{args.prefix}-{i:0{args.digits}d}.png"
+        if args.naming == "sequential":
+            new_name = f"{args.prefix}-{i:0{args.digits}d}.png"
+        else:
+            new_name = src_path.stem + ".png"
+            if new_name in used_names:
+                base = src_path.stem
+                dupe_i = 2
+                while f"{base}-{dupe_i}.png" in used_names:
+                    dupe_i += 1
+                new_name = f"{base}-{dupe_i}.png"
+        used_names.add(new_name)
         dst_path = output_dir / new_name
         print(f"[{i - args.start + 1}/{len(files)}] {src_path.name} -> {new_name}")
 
