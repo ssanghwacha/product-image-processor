@@ -2,8 +2,8 @@
 
 A small AI-assisted tool that takes 100+ inconsistent product photos (different
 backgrounds, sizes, padding) and turns them into a uniform set of icon assets —
-background removed, product centered, sized to fit consistently inside a 60×60
-circular slot, and renamed sequentially.
+background removed, product centered, and sized to fit consistently inside a
+60×60 circular slot.
 
 Built for a specific need: a Figma prototype needed 100+ product images to look
 visually consistent inside circular icon slots. Rather than editing each one by
